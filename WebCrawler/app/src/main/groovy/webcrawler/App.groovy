@@ -1,51 +1,44 @@
 package webcrawler
 
-import groovyx.net.http.HttpBuilder
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
-import org.jsoup.select.Elements
+import webcrawler.Utils.HtmlTool
+import webcrawler.Utils.HttpRequest
 
-import java.util.concurrent.CompletableFuture
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+
 class App {
     static void main(String[] args) {
         try {
-            CompletableFuture future = HttpBuilder.configure {
-                request.uri = 'https://www.gov.br/ans/pt-br/assuntos/prestadores/padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss/padrao-tiss-historico-das-versoes-dos-componentes-do-padrao-tiss'
-            }.getAsync()
+            Path currentDirectory = Paths.get(".").toAbsolutePath()
+            Path dirPath = currentDirectory.resolve("Download")
+            if (!Files.exists(dirPath))
+                Files.createDirectory(dirPath)
 
-            Object result = future.get()
-            Document doc = Jsoup.parse(result.toString())
+            String urlHistoricVersion =
+                    "https://www.gov.br/ans/pt-br/assuntos/prestadores/" +
+                            "padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss/" +
+                            "padrao-tiss-historico-das-versoes-dos-componentes-do-padrao-tiss"
 
-            Elements rows = doc.select("table tr:gt(0)")
+            String urlComponents =
+                    "https://www.gov.br/ans/pt-br/assuntos/prestadores/" +
+                        "padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss/" +
+                        "padrao-tiss-2013-julho-2023"
 
-            for (Element row : rows) {
-                Elements columns = row.select("td")
+            String urlTableAns = "https://www.gov.br/ans/pt-br/assuntos/" +
+                "prestadores/padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss/" +
+                    "padrao-tiss-tabelas-relacionadas"
 
-                if (columns.size() >= 3) {
-                    String competence = columns.get(0).text()
-                    String publication = columns.get(1).text()
-                    String startTerm = columns.get(2).text()
 
-                    int competenceSize = competence.length()
+            Object responseHistoric = HttpRequest
+                    .getResponse(urlHistoricVersion)
+            HtmlTool.extractAndSaveTable(responseHistoric, dirPath)
 
-                    if (competenceSize >= 4) {
-                        String lastCharacters = competence
-                                .substring(competenceSize - 4)
-                        println(lastCharacters)
-                        int year = Integer.parseInt(lastCharacters)
-                        if (year >= 2016) {
-                            // TODO: write text in file .txt
-                            // https://code-maven.com/groovy-files
-                            println("Competência: " + competence)
-                            println("Publicação: " + publication)
-                            println("Início de Vigência: " +
-                                    startTerm)
-                            println()
-                        }
-                    }
-                }
-            }
+            Object responseComponents = HttpRequest.getResponse(urlComponents)
+            HtmlTool.downloadComponents(responseComponents, dirPath)
+
+            Object responseTableAns = HttpRequest.getResponse(urlTableAns)
+            HtmlTool.downloadTableAns(dirPath, responseTableAns)
 
         } catch (Exception e) {
             e.printStackTrace()
