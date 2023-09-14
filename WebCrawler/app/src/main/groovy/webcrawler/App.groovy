@@ -6,10 +6,18 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.concurrent.CompletableFuture
 class App {
     static void main(String[] args) {
         try {
+            Path currentDirectory = Paths.get(".").toAbsolutePath()
+            Path dirPath = currentDirectory.resolve("Download")
+            if (!Files.exists(dirPath))
+                Files.createDirectory(dirPath)
+
             CompletableFuture future = HttpBuilder.configure {
                 request.uri = 'https://www.gov.br/ans/pt-br/assuntos/prestadores/padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss/padrao-tiss-historico-das-versoes-dos-componentes-do-padrao-tiss'
             }.getAsync()
@@ -32,18 +40,20 @@ class App {
                     if (competenceSize >= 4) {
                         String lastCharacters = competence
                                 .substring(competenceSize - 4)
-                        println(lastCharacters)
                         int year = Integer.parseInt(lastCharacters)
                         if (year >= 2016) {
-                            // TODO: write text in file .txt
-                            // https://code-maven.com/groovy-files
-                            println("Competência: " + competence)
-                            println("Publicação: " + publication)
-                            println("Início de Vigência: " +
-                                    startTerm)
-                            println()
+                            File file = new File(dirPath.toString(),
+                                    "historico_versoes_componentes.txt")
+                            file.withWriterAppend { writer ->
+                                writer.writeLine("Competência: $competence")
+                                writer.writeLine("Publicação: $publication")
+                                writer.writeLine("Início de Vigência: $startTerm")
+                                writer.writeLine("")
+                            }
+
                         }
                     }
+
                 }
             }
 
