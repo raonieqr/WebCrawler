@@ -8,8 +8,8 @@ import org.jsoup.select.Elements
 import java.nio.file.Path
 
 class HtmlTool {
-    static void extractAndSaveTable(Object result, Path dirPath) {
-        Document doc = Jsoup.parse(result.toString())
+    static void extractAndSaveTable(Object response, Path dirPath) {
+        Document doc = Jsoup.parse(response.toString())
 
         Elements rows = doc.select("table tr:gt(0)")
 
