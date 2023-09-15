@@ -2,20 +2,20 @@ package webcrawler.Utils
 
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 class FileManager {
-    static void createFolder(Path dirPath) {
 
-        if (!Files.exists(dirPath))
+    static void createFolder(Path dirPath) {
+        if (!Files.exists(dirPath)) {
             Files.createDirectory(dirPath)
+        }
     }
 
     static ArrayList<String> readEmails(Path currentDirectory) {
-        ArrayList<String> emails = new ArrayList<>()
+        ArrayList<String> emails = []
 
         File file = new File(currentDirectory.toString(),
-                "emails.txt")
+                'emails.txt')
 
         file.withReader { reader ->
             reader.eachLine { line ->
@@ -24,4 +24,5 @@ class FileManager {
         }
         return emails
     }
+
 }

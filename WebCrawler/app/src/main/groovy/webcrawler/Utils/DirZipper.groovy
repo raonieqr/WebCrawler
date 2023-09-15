@@ -6,7 +6,6 @@ import java.util.zip.ZipOutputStream
 class DirZipper {
 
     static void zipFolder(String sourceFolderPath, String outputZipFilePath) {
-
         def sourceFolder = new File(sourceFolderPath)
         def outputFile = new File(outputZipFilePath)
         def buffer = new byte[1024]
@@ -22,18 +21,15 @@ class DirZipper {
     }
 
     static void addFilesToZip(File baseFolder, File currentFolder, ZipOutputStream zipOutputStream, byte[] buffer) throws IOException {
-
         currentFolder.eachFile { file ->
             def entryName = currentFolder.toPath().relativize(file.toPath()).toString()
 
             if (file.isDirectory()) {
-
-                zipOutputStream.putNextEntry(new ZipEntry(entryName + "/"))
+                zipOutputStream.putNextEntry(new ZipEntry(entryName + '/'))
 
                 addFilesToZip(baseFolder, file, zipOutputStream, buffer)
             }
             else {
-
                 zipOutputStream.putNextEntry(new ZipEntry(entryName))
 
                 def input = new FileInputStream(file)
