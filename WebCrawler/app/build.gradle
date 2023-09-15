@@ -34,6 +34,10 @@ dependencies {
     //Jsoup
     implementation 'org.jsoup:jsoup:1.16.1'
 
+    // Apache email
+    implementation 'org.apache.commons:commons-email:1.5'
+
+
     // Junit
     testImplementation 'junit:junit:4.13.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
