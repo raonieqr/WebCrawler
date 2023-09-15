@@ -1,7 +1,5 @@
 package webcrawler.Utils
 
-import groovyx.net.http.HttpBuilder
-import groovyx.net.http.optional.Download
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element

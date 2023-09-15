@@ -1,5 +1,8 @@
 package webcrawler
 
+import webcrawler.Utils.DirZipper
+import webcrawler.Utils.EmailHandler
+import webcrawler.Utils.FileManager
 import webcrawler.Utils.HtmlTool
 import webcrawler.Utils.HttpRequest
 
@@ -12,9 +15,8 @@ class App {
         try {
             Path currentDirectory = Paths.get(".").toAbsolutePath()
             Path dirPath = currentDirectory.resolve("Download")
-            if (!Files.exists(dirPath))
-                Files.createDirectory(dirPath)
 
+            FileManager.createFolder(dirPath)
             String urlHistoricVersion =
                     "https://www.gov.br/ans/pt-br/assuntos/prestadores/" +
                             "padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss/" +
@@ -39,6 +41,17 @@ class App {
 
             Object responseTableAns = HttpRequest.getResponse(urlTableAns)
             HtmlTool.downloadTableAns(dirPath, responseTableAns)
+
+//            DirZipper.zipFolder(dirPath.toString(), dirPath.toString() + ".zip")
+
+            ArrayList<String> emails = FileManager.readEmails(currentDirectory)
+
+            emails.each {to ->
+                EmailHandler.sendMsg(to,
+                        dirPath.toString() + "/",
+                        "historico_versoes_componentes.txt",
+                        "botraoni@gmail.com")
+            }
 
         } catch (Exception e) {
             e.printStackTrace()
